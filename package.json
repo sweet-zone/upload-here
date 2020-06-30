@@ -1,8 +1,9 @@
 {
 	"name": "upload-here",
 	"displayName": "upload here",
+	"icon": "assets/icon.png",
 	"description": "right click here, short cut here, upload here",
-	"version": "0.0.3",
+	"version": "1.0.0",
 	"engines": {
 		"vscode": "^1.45.0"
 	},
@@ -10,9 +11,11 @@
 	"categories": [
 		"Other"
 	],
+	"keywords": ["upload", "image", "insert", "flash"],
 	"activationEvents": [
 		"onCommand:upload-here.UploadHere"
 	],
+	"repository": "https://github.com/zjzhome/upload-here",
 	"main": "./extension.js",
 	"contributes": {
 		"commands": [
