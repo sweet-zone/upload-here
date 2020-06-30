@@ -2,7 +2,7 @@
 	"name": "upload-here",
 	"displayName": "upload here",
 	"description": "right click here, short cut here, upload here",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"engines": {
 		"vscode": "^1.45.0"
 	},

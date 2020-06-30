@@ -4,7 +4,8 @@ Upload HERE!
 
 ## Features
 
-使用快捷键或者鼠标右键，上传本地图片然后将上传结果插入到光标位置。
+1. 使用快捷键或者鼠标右键，上传本地图片然后将上传结果插入到光标位置。
+2. markdown 文件支持插入markdown 图片语法，对于写文档很便利。
 
 ## Extension Settings
 
@@ -22,7 +23,15 @@ Upload HERE!
 }
 ```
 
+默认快捷键
+
+`shift + alt + p`
+
 ## Release Notes
+
+### 0.0.3
+
+markdown 文件支持插入markdown 图片语法，对于写文档很便利。
 
 ### 0.0.1
 

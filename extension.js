@@ -10,6 +10,25 @@ const axiosSource = AxiosCancelToken.source();
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 
+function getFileNameFromLocalFilePath(filePath) {
+	const arr = filePath.split('/');
+	if(!arr || !arr.length) {
+		return '';
+	}
+	return arr[arr.length - 1];
+}
+
+function getCurrentFileType() {
+	if(vscode.window.activeTextEditor) {
+		return vscode.window.activeTextEditor.document.languageId
+	}
+	return '';
+}
+
+function isMarkdownFile() {
+	return getCurrentFileType() === 'markdown';
+}
+
 function uploadImage(uploadUrl, filePath) {
 	const form = new FormData();
 	form.append('file', fs.createReadStream(filePath));
@@ -29,8 +48,11 @@ function uploadImage(uploadUrl, filePath) {
 			})
 			.then((response) => {
 				if(response.data && response.data.data && response.data.data.url) {
-					vscode.env.clipboard.writeText(response.data.data.url);
-					vscode.window.activeTextEditor.insertSnippet(new vscode.SnippetString(response.data.data.url));
+					const imageUrl = response.data.data.url;
+					vscode.env.clipboard.writeText(imageUrl);
+					const snippet = isMarkdownFile() ? 
+						`![${getFileNameFromLocalFilePath(filePath)}](${imageUrl})` : imageUrl;
+					vscode.window.activeTextEditor.insertSnippet(new vscode.SnippetString(snippet));
 				} else {
 					vscode.window.showErrorMessage('上传失败，请重试');
 				}
