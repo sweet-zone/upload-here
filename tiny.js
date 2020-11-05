@@ -50,5 +50,22 @@ module.exports = {
         try {
             fs.unlinkSync(filePath);
         } catch(e) {}
+    },
+
+    handleError(err) {
+        if (err instanceof tinify.AccountError) {
+            return err.message;
+            // Verify your API key and account limit.
+        } 
+        if (err instanceof tinify.ClientError) {
+            return 'Check your source image and request options.';
+        } 
+        if (err instanceof tinify.ServerError) {
+            return 'Temporary issue with the Tinify API';
+        } 
+        if (err instanceof tinify.ConnectionError) {
+            return 'A network connection error occurred.';
+        } 
+        return '压缩失败';
     }
 }

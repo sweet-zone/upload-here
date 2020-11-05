@@ -4,6 +4,7 @@ const vscode = require('vscode');
 const FormData = require('form-data');
 const axios = require('axios');
 const fs = require('fs');
+const path = require('path');
 const tiny = require('./tiny');
 const AxiosCancelToken = axios.CancelToken;
 const axiosSource = AxiosCancelToken.source();
@@ -30,14 +31,15 @@ function isMarkdownFile() {
 	return getCurrentFileType() === 'markdown';
 }
 
-async function uploadImage(uploadUrl, filePath, needTiny) {
+async function uploadImage(uploadUrl, filePath, useTinyPNG) {
 	const form = new FormData();
 
-	if(needTiny) {
+	if(useTinyPNG) {
 		try {
 			filePath = await tiny.compress2(filePath);
 		} catch(e) {
-			vscode.window.showErrorMessage('使用tiny压缩失败，上传源文件');
+			vscode.window.showErrorMessage(`upload here error: ${tiny.handleError(e)}`);
+			return;
 		}
 	}
 
@@ -66,7 +68,7 @@ async function uploadImage(uploadUrl, filePath, needTiny) {
 				} else {
 					vscode.window.showErrorMessage('上传失败，请重试');
 				}
-				needTiny && tiny.removeFileFromDisk(filePath);
+				useTinyPNG && tiny.removeFileFromDisk(filePath);
 				resolve();
 			}).
 			catch((thrown) => {
@@ -76,7 +78,7 @@ async function uploadImage(uploadUrl, filePath, needTiny) {
 				} else {
 					vscode.window.showErrorMessage('上传失败，请重试');
 				}
-				needTiny && tiny.removeFileFromDisk(filePath);
+				useTinyPNG && tiny.removeFileFromDisk(filePath);
 				reject();
 			})
 		})
@@ -101,15 +103,6 @@ async function activate(context) {
 		return;
 	}
 
-	if(uploadHereConfig.tinyPNGKey) {
-		tiny.initTiny(uploadHereConfig.tinyPNGKey);
-		const validateTiny = await tiny.validateTinyKey();
-		if(!validateTiny) {
-			vscode.window.showErrorMessage('请输入有效的 tinyPNG Key');
-			return;
-		}
-	}
-
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with  registerCommand
 	// The commandId parameter must match the command field in package.json
@@ -122,9 +115,26 @@ async function activate(context) {
 			filters: {
 				'Images': ['png', 'jpg', 'ico', 'jpeg', 'svg', 'gif']
 			}
-		}).then((fileUri) => {
+		}).then(async (fileUri) => {
 			if (fileUri && fileUri[0]) {
-				uploadImage(uploadUrl, fileUri[0].fsPath, !!uploadHereConfig.tinyPNGKey);
+				let config = vscode.workspace.getConfiguration('upload here');
+				let useTinyPNG = config.tinyPNGKey && config.useTinyPNG;
+				const filePath = fileUri[0].fsPath;
+				const ext = path.extname(filePath);
+				// png jpg 图片才进行压缩
+				if(ext !== '.png' && ext !== '.jpg' && ext !== 'jpeg') {
+					useTinyPNG = false;
+				}
+
+				if(useTinyPNG) {
+					tiny.initTiny(uploadHereConfig.tinyPNGKey);
+					// const validateTiny = await tiny.validateTinyKey();
+					// if(!validateTiny) {
+					// 	vscode.window.showErrorMessage('请输入有效的 tinyPNG Key');
+					// 	return;
+					// }
+				}
+				uploadImage(uploadUrl, filePath, useTinyPNG);
 			}
 		});
 	});

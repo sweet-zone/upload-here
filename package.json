@@ -3,7 +3,7 @@
 	"displayName": "upload here",
 	"icon": "assets/icon.png",
 	"description": "right click here, short cut here, upload here",
-	"version": "1.0.0",
+	"version": "2.1.1",
 	"engines": {
 		"vscode": "^1.45.0"
 	},
@@ -47,10 +47,15 @@
 					"default": null,
 					"description": "指定上传图片接口地址"
 				},
+				"upload here.useTinyPNG": {
+					"type": "boolean",
+					"default": true,
+					"description": "是否使用 tinyPNG 压缩，若设置为 true，则还需要配置 tinyPNG key"
+				},
 				"upload here.tinyPNGKey": {
 					"type": "string",
 					"default": null,
-					"description": "tinyPNG key，如果指定key则会先调用tinyPNG进行压缩"
+					"description": "tinyPNG key"
 				}
 			}
 		},

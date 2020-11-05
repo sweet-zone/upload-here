@@ -8,6 +8,7 @@ A VSCode plugin, right click here, short cut here, upload here!
 
 1. 使用快捷键（默认 shift + alt + p）或者鼠标右键，上传本地图片然后将上传结果插入到光标位置。
 2. markdown 文件支持插入markdown 图片语法，对于写文档很便利。
+3. 支持上传之前使用 tinypng 压缩，要使用此功能，需要首先配置 tinyPNG key，配置之后，如果图片为 png 或者 jpg格式则会使用 tinyPNG。具体见：https://tinypng.com/developers
 
 ## Extension Settings
 
@@ -26,6 +27,10 @@ A VSCode plugin, right click here, short cut here, upload here!
 ```
 
 ## Release Notes
+
+### 2.1.1
+
+支持 tinyPNG
 
 ### 1.0.0
 
