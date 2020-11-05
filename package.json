@@ -11,7 +11,12 @@
 	"categories": [
 		"Other"
 	],
-	"keywords": ["upload", "image", "insert", "flash"],
+	"keywords": [
+		"upload",
+		"image",
+		"insert",
+		"flash"
+	],
 	"activationEvents": [
 		"onCommand:upload-here.UploadHere"
 	],
@@ -41,6 +46,11 @@
 					"type": "string",
 					"default": null,
 					"description": "指定上传图片接口地址"
+				},
+				"upload here.tinyPNGKey": {
+					"type": "string",
+					"default": null,
+					"description": "tinyPNG key，如果指定key则会先调用tinyPNG进行压缩"
 				}
 			}
 		},
@@ -71,6 +81,7 @@
 	},
 	"dependencies": {
 		"axios": "^0.19.2",
-		"form-data": "^3.0.0"
+		"form-data": "^3.0.0",
+		"tinify": "^1.6.0-beta.2"
 	}
 }

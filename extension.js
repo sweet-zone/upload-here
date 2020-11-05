@@ -4,6 +4,7 @@ const vscode = require('vscode');
 const FormData = require('form-data');
 const axios = require('axios');
 const fs = require('fs');
+const tiny = require('./tiny');
 const AxiosCancelToken = axios.CancelToken;
 const axiosSource = AxiosCancelToken.source();
 
@@ -29,8 +30,17 @@ function isMarkdownFile() {
 	return getCurrentFileType() === 'markdown';
 }
 
-function uploadImage(uploadUrl, filePath) {
+async function uploadImage(uploadUrl, filePath, needTiny) {
 	const form = new FormData();
+
+	if(needTiny) {
+		try {
+			filePath = await tiny.compress2(filePath);
+		} catch(e) {
+			vscode.window.showErrorMessage('使用tiny压缩失败，上传源文件');
+		}
+	}
+
 	form.append('file', fs.createReadStream(filePath));
 
 	vscode.window.withProgress({
@@ -56,6 +66,7 @@ function uploadImage(uploadUrl, filePath) {
 				} else {
 					vscode.window.showErrorMessage('上传失败，请重试');
 				}
+				needTiny && tiny.removeFileFromDisk(filePath);
 				resolve();
 			}).
 			catch((thrown) => {
@@ -65,6 +76,7 @@ function uploadImage(uploadUrl, filePath) {
 				} else {
 					vscode.window.showErrorMessage('上传失败，请重试');
 				}
+				needTiny && tiny.removeFileFromDisk(filePath);
 				reject();
 			})
 		})
@@ -74,7 +86,7 @@ function uploadImage(uploadUrl, filePath) {
 /**
  * @param {vscode.ExtensionContext} context
  */
-function activate(context) {
+async function activate(context) {
 
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
 	// This line of code will only be executed once when your extension is activated
@@ -87,6 +99,15 @@ function activate(context) {
 	if(!uploadUrl) {
 		vscode.window.showErrorMessage('请先配置图片上传接口地址');
 		return;
+	}
+
+	if(uploadHereConfig.tinyPNGKey) {
+		tiny.initTiny(uploadHereConfig.tinyPNGKey);
+		const validateTiny = await tiny.validateTinyKey();
+		if(!validateTiny) {
+			vscode.window.showErrorMessage('请输入有效的 tinyPNG Key');
+			return;
+		}
 	}
 
 	// The command has been defined in the package.json file
@@ -103,8 +124,7 @@ function activate(context) {
 			}
 		}).then((fileUri) => {
 			if (fileUri && fileUri[0]) {
-				console.log(fileUri[0]);
-				uploadImage(uploadUrl, fileUri[0].fsPath);
+				uploadImage(uploadUrl, fileUri[0].fsPath, !!uploadHereConfig.tinyPNGKey);
 			}
 		});
 	});
